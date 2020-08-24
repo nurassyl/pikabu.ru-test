@@ -51,14 +51,14 @@ thread_cache_size       = 8
 # This replaces the startup script and checks MyISAM tables if needed
 # the first time they are touched
 myisam-recover-options  = BACKUP
-#max_connections        = 100
+max_connections        = 999
 #table_open_cache       = 64
 #thread_concurrency     = 10
 #
 # * Query Cache Configuration
 #
-query_cache_limit	= 1M
-query_cache_size        = 16M
+query_cache_limit       = 1M
+query_cache_size        = 0
 #
 # * Logging and Replication
 #
@@ -73,9 +73,9 @@ query_cache_size        = 16M
 log_error = /var/log/mysql/error.log
 #
 # Here you can see queries with especially long duration
-#slow_query_log		= 1
-#slow_query_log_file	= /var/log/mysql/mysql-slow.log
-#long_query_time = 2
+slow_query_log         = 1
+slow_query_log_file    = /var/log/mysql/mysql-slow.log
+long_query_time        = 2
 #log-queries-not-using-indexes
 #
 # The following can be used as easy to replay backup logs or for replication.
@@ -92,6 +92,12 @@ max_binlog_size   = 100M
 #
 # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
 # Read the manual for more InnoDB related options. There are many!
+innodb_buffer_pool_size          = 1536M # 75% of memory
+innodb_log_file_size             = 512M
+innodb_flush_log_at_trx_commit   = 1
+innodb_flush_method              = fsync
+innodb_file_per_table            = ON
+innodb_log_buffer_size           = 1M
 #
 # * Security Features
 #
@@ -103,3 +109,12 @@ max_binlog_size   = 100M
 # ssl-ca=/etc/mysql/cacert.pem
 # ssl-cert=/etc/mysql/server-cert.pem
 # ssl-key=/etc/mysql/server-key.pem
+#
+# Charset
+character_set_server          = utf8
+collation_server              = utf8_general_ci
+#
+# Transaction
+#
+transaction_isolation         = READ-COMMITTED
+
