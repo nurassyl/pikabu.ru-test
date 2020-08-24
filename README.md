@@ -25,7 +25,7 @@ sudo apt-get install -y php7.3
 Install PHP extensions
 
 ```bash
-sudo apt-get install -y php7.3-mysql
+sudo apt-get install -y php7.3-mbstring php7.3-ctype php7.3-bcmath php7.3-tokenizer php7.3-json php7.3-xml php7.3-opcache php7.3-mysql
 ```
 
 
