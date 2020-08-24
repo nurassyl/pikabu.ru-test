@@ -50,7 +50,16 @@ sudo mysql_secure_installtion
 ```
 
 
-Create database
+MySQL: Create user
+
+```bash
+mysql> CREATE USER 'nurassyl'@'localhost' IDENTIFIED BY '12345';
+mysql> GRANT ALL PRIVILEGES ON * . * TO 'nurassyl'@'localhost';
+mysql> FLUSH PRIVILEGES;
+```
+
+
+MySQL: Create database
 
 ```bash
 mysql> CREATE DATABASE pikabu_ru_test;
@@ -62,5 +71,12 @@ Configure MySQL server
 ```bash
 sudo cp -f mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo /etc/init.d/mysql restart
+```
+
+
+Configure app
+
+```bash
+vim config/
 ```
 
