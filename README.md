@@ -80,3 +80,9 @@ Configure app
 vim config/
 ```
 
+
+Seed the database
+
+```bash
+php db_seed.php
+```
