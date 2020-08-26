@@ -43,10 +43,18 @@ sudo apt-get install -y mysql-server
 ```
 
 
+Configure MySQL server
+
+```bash
+sudo cp -f mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+sudo /etc/init.d/mysql restart
+```
+
+
 Set '12345' password for 'root' user.
 
 ```bash
-sudo mysql_secure_installtion
+sudo mysql_secure_installation
 ```
 
 
@@ -66,14 +74,6 @@ mysql> CREATE DATABASE pikabu_ru_test;
 ```
 
 
-Configure MySQL server
-
-```bash
-sudo cp -f mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
-sudo /etc/init.d/mysql restart
-```
-
-
 Configure app
 
 ```bash
@@ -86,3 +86,4 @@ Seed the database
 ```bash
 php db_seed.php
 ```
+
