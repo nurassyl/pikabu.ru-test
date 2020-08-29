@@ -63,12 +63,66 @@ class UserRelations implements IUserRelations
 
 	public function isFriend(IUser $user, int $maxScanDepth = 0): bool
 	{
-		return true;
+		$user_ids = [];
+		$user_ids[] = $this->user->getId();
+
+		$i = 1;
+		while(true) {
+			if(count($user_ids) === 0) break;
+
+			$r = $this->db->query("SELECT DISTINCT relation_id FROM user_relations WHERE user_id IN (" . implode($user_ids, ', ') . ") AND type = 0 LIMIT " . self::MAX_DIRECT_RELATIONS);
+
+			$user_ids = [];
+			while($row = $r->fetch_assoc()) {
+				if(intval($row['relation_id']) === $user->getId()) {
+					return true;
+				}
+
+				$user_ids[] = intval($row['relation_id']);
+			}
+
+			if($maxScanDepth !== 0) {
+				if($i === $maxScanDepth) {
+					break;
+				}
+				$i++;
+			}
+		}
+
+		return false;
 	}
 
 	public function isFoe(IUser $user, int $maxScanDepth = 0): bool
 	{
-		return true;
+		$user_ids = [];
+		$user_ids[] = $this->user->getId();
+
+		$i = 1;
+		while(true) {
+			if(count($user_ids) === 0) break;
+
+			$r = $this->db->query("SELECT DISTINCT relation_id, type FROM user_relations WHERE user_id IN (" . implode($user_ids, ', ') . ") LIMIT " . self::MAX_DIRECT_RELATIONS);
+
+			$user_ids = [];
+			while($row = $r->fetch_assoc()) {
+				if(intval($row['relation_id']) === $user->getId() && $row['type'] === '1') {
+					return true;
+				}
+
+				if($row['type'] === '0') {
+					$user_ids[] = intval($row['relation_id']);
+				}
+			}
+
+			if($maxScanDepth !== 0) {
+				if($i === $maxScanDepth) {
+					break;
+				}
+				$i++;
+			}
+		}
+
+		return false;
 	}
 
 	public function getAllFriends(int $maxScanDepth = 0): array
