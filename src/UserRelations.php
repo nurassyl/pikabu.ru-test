@@ -195,7 +195,17 @@ class UserRelations implements IUserRelations
 
 	public function getConflictUsers(int $maxScanDepth = 0): array
 	{
-		return [];
+		$friends = $this->getAllFriends($maxScanDepth);
+
+		$users = [];
+
+		foreach($friends as &$friend) {
+			if($this->isFoe($friend, $maxScanDepth)) {
+				$users[] = $friend;
+			}
+		}
+
+		return $users;
 	}
 }
 
