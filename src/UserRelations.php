@@ -71,6 +71,7 @@ class UserRelations implements IUserRelations
 	{
 		$user_ids = [];
 		$user_ids[] = $this->user->getId();
+		$got_ids = [];
 
 		$i = 1;
 		while(true) {
@@ -80,11 +81,16 @@ class UserRelations implements IUserRelations
 
 			$user_ids = [];
 			while($row = $r->fetch_assoc()) {
-				if(intval($row['relation_id']) === $user->getId()) {
+				$relation_id = intval($row['relation_id']);
+				if($relation_id === $user->getId()) {
 					return true;
+				} else {
+					$got_ids[] = $relation_id;
 				}
 
-				$user_ids[] = intval($row['relation_id']);
+				if(!in_array($relation_id, $got_ids)) {
+					$user_ids[] = intval($row['relation_id']);
+				}
 			}
 
 			if($maxScanDepth !== 0) {
@@ -104,6 +110,7 @@ class UserRelations implements IUserRelations
 
 		$user_ids = [];
 		$user_ids[] = $this->user->getId();
+		$got_ids = [];
 
 		$i = 1;
 		while(true) {
@@ -113,12 +120,19 @@ class UserRelations implements IUserRelations
 
 			$user_ids = [];
 			while($row = $r->fetch_assoc()) {
-				if(intval($row['relation_id']) === $user->getId() && $row['type'] === '1') {
+				$relation_id = intval($row['relation_id']);
+				if($relation_id === $user->getId() && $row['type'] === '1') {
 					return true;
+				} else {
+					$got_ids[] = $relation_id;
 				}
 
-				if($row['type'] === '0') {
-					$user_ids[] = intval($row['relation_id']);
+
+
+				if(!in_array($relation_id, $got_ids)) {
+					if($row['type'] === '0') {
+						$user_ids[] = intval($row['relation_id']);
+					}
 				}
 			}
 
