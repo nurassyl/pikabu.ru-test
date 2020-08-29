@@ -9,5 +9,5 @@ $result = $db->query('ALTER TABLE user_relations ADD FOREIGN KEY `fk-user_relati
 $result = $db->query('CREATE INDEX `idx-user_relations-relation_id` ON user_relations (relation_id)');
 $result = $db->query('ALTER TABLE user_relations ADD FOREIGN KEY `fk-user_relations-relation_id` (relation_id) REFERENCES `users` (id) ON DELETE CASCADE');
 
-$result = $db->query("INSERT INTO users (name) VALUES ('Nurasyl'), ('Guldana'), ('Nurgazy'), ('Zhadyra')");
+$result = $db->query("INSERT INTO users (name) VALUES ('UserA'), ('UserB'), ('UserC'), ('UserD'), ('UserE')");
 

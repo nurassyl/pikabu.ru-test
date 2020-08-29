@@ -13,12 +13,14 @@ class UserRelations implements IUserRelations
 
 	private function getNumberOfRelations(): int
 	{
-		$r = $this->db->query("SELECT COUNT(*) FROM user_relations WHERE user_id = " . $this->user->getId() . "");
+		$r = $this->db->query("SELECT COUNT(*) FROM user_relations WHERE user_id = " . $this->user->getId() . " LIMIT " . self::MAX_DIRECT_RELATIONS);
 		return $r->fetch_array()[0];
 	}
 
 	public function addFriend(IUser $user): bool
 	{
+		if($this->user->getId() === $user->getId()) return false;
+
 		$this->db->query('START TRANSACTION');
 
 		if($this->getNumberOfRelations() >= self::MAX_DIRECT_RELATIONS) {
@@ -28,7 +30,7 @@ class UserRelations implements IUserRelations
 		$r = $this->db->query("SELECT COUNT(*) FROM user_relations WHERE user_id = " . $this->user->getId() . " AND relation_id = " . $user->getId() . " LIMIT 1");
 		$r = intval($r->fetch_array()[0]);
 		if($r === 0) {
-			$this->db->query("INSERT INTO user_relations (user_id, relation_id, type) VALUES (" . $this->user->getId() . ", " . $user->getId() . ", 0)");
+			$this->db->query("INSERT INTO user_relations (user_id, relation_id, type) VALUES (" . $this->user->getId() . ", " . $user->getId() . ", 0), (" . $user->getId() . ", " . $this->user->getId() . ", 0)");
 			return $this->db->query('COMMIT');
 		} else {
 			//throw new Exception('Already exists.');
@@ -39,6 +41,8 @@ class UserRelations implements IUserRelations
 
 	public function addFoe(IUser $user): bool
 	{
+		if($this->user->getId() === $user->getId()) return false;
+
 		$this->db->query('START TRANSACTION');
 
 		if($this->getNumberOfRelations() >= self::MAX_DIRECT_RELATIONS) {
@@ -47,7 +51,7 @@ class UserRelations implements IUserRelations
 		$r = $this->db->query("SELECT COUNT(*) FROM user_relations WHERE user_id = " . $this->user->getId() . " AND relation_id = " . $user->getId() . " LIMIT 1");
 		$r = intval($r->fetch_array()[0]);
 		if($r === 0) {
-			$this->db->query("INSERT INTO user_relations (user_id, relation_id, type) VALUES (" . $this->user->getId() . ", " . $user->getId() . ", 1)");
+			$this->db->query("INSERT INTO user_relations (user_id, relation_id, type) VALUES (" . $this->user->getId() . ", " . $user->getId() . ", 1), (" . $user->getId() . ", " . $this->user->getId() . ", 1)");
 			return $this->db->query('COMMIT');
 		} else {
 			//throw new Exception('Already exists.');
@@ -58,7 +62,9 @@ class UserRelations implements IUserRelations
 
 	public function removeRelation(IUser $user): bool
 	{
-		return $this->db->query("DELETE FROM user_relations WHERE user_id = " . $this->user->getId() . " AND relation_id = " . $user->getId() . " LIMIT 1");
+		if($this->user->getId() === $user->getId()) return false;
+
+		return $this->db->query("DELETE FROM user_relations WHERE (user_id = " . $this->user->getId() . " AND relation_id = " . $user->getId() . ") OR (user_id = " . $user->getId() . " AND relation_id = " . $this->user->getId() . ") LIMIT 2");
 	}
 
 	public function isFriend(IUser $user, int $maxScanDepth = 0): bool
@@ -94,6 +100,8 @@ class UserRelations implements IUserRelations
 
 	public function isFoe(IUser $user, int $maxScanDepth = 0): bool
 	{
+		if($this->user->getId() === $user->getId()) return false;
+
 		$user_ids = [];
 		$user_ids[] = $this->user->getId();
 
@@ -140,9 +148,11 @@ class UserRelations implements IUserRelations
 
 			$user_ids = [];
 			while($row = $r->fetch_assoc()) {
-				$friends_ids[] = intval($row['relation_id']);
-
-				$user_ids[] = intval($row['relation_id']);
+				$relation_id = intval($row['relation_id']);
+				if($relation_id !== $this->user->getId()) {
+					$friends_ids[] = $relation_id;
+					$user_ids[] = $relation_id;
+				}
 			}
 
 			if($maxScanDepth !== 0) {
@@ -154,13 +164,14 @@ class UserRelations implements IUserRelations
 		}
 
 
-
 		$users = [];
 
-		$r = $this->db->query("SELECT id, name FROM users WHERE id IN (" . implode($friends_ids, ', ') . ") LIMIT ". count($friends_ids));
+		if(count($friends_ids) > 0) {
+			$r = $this->db->query("SELECT id, name FROM users WHERE id IN (" . implode($friends_ids, ', ') . ") LIMIT ". count($friends_ids));
 
-		while($row = $r->fetch_assoc()) {
-			$users[] = new User($row['id'], $row['name'], false);
+			while($row = $r->fetch_assoc()) {
+				$users[] = new User($row['id'], $row['name'], false);
+			}
 		}
 
 		return $users;
