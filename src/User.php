@@ -10,7 +10,7 @@ class User implements IUser
 		if($db_request === true) {
 			global $db;
 
-			$r = $db->query("SELECT * FROM users WHERE id = $id")->fetch_array();
+			$r = $db->query("SELECT id, name FROM users WHERE id = $id")->fetch_array();
 
 			if(is_null($r)) throw new Exception('User not found.');
 
