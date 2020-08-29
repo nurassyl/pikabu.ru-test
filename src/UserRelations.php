@@ -127,7 +127,43 @@ class UserRelations implements IUserRelations
 
 	public function getAllFriends(int $maxScanDepth = 0): array
 	{
-		return [];
+		$user_ids = [];
+		$user_ids[] = $this->user->getId();
+
+		$friends_ids = [];
+
+		$i = 1;
+		while(true) {
+			if(count($user_ids) === 0) break;
+
+			$r = $this->db->query("SELECT DISTINCT relation_id FROM user_relations WHERE user_id IN (" . implode($user_ids, ', ') . ") AND type = 0 LIMIT " . self::MAX_DIRECT_RELATIONS);
+
+			$user_ids = [];
+			while($row = $r->fetch_assoc()) {
+				$friends_ids[] = intval($row['relation_id']);
+
+				$user_ids[] = intval($row['relation_id']);
+			}
+
+			if($maxScanDepth !== 0) {
+				if($i === $maxScanDepth) {
+					break;
+				}
+				$i++;
+			}
+		}
+
+
+
+		$users = [];
+
+		$r = $this->db->query("SELECT id, name FROM users WHERE id IN (" . implode($friends_ids, ', ') . ") LIMIT ". count($friends_ids));
+
+		while($row = $r->fetch_assoc()) {
+			$users[] = new User($row['id'], $row['name'], false);
+		}
+
+		return $users;
 	}
 
 	public function getConflictUsers(int $maxScanDepth = 0): array
