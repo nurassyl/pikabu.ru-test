@@ -150,8 +150,10 @@ class UserRelations implements IUserRelations
 			while($row = $r->fetch_assoc()) {
 				$relation_id = intval($row['relation_id']);
 				if($relation_id !== $this->user->getId()) {
-					$friends_ids[] = $relation_id;
-					$user_ids[] = $relation_id;
+					if(!in_array($relation_id, $friends_ids)) {
+						$friends_ids[] = $relation_id;
+						$user_ids[] = $relation_id;
+					}
 				}
 			}
 
