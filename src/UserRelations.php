@@ -89,7 +89,7 @@ class UserRelations implements IUserRelations
 				}
 
 				if(!in_array($relation_id, $got_ids)) {
-					$user_ids[] = intval($row['relation_id']);
+					$user_ids[] = $relation_id;
 				}
 			}
 
@@ -128,10 +128,9 @@ class UserRelations implements IUserRelations
 				}
 
 
-
 				if(!in_array($relation_id, $got_ids)) {
 					if($row['type'] === '0') {
-						$user_ids[] = intval($row['relation_id']);
+						$user_ids[] = $relation_id;
 					}
 				}
 			}
