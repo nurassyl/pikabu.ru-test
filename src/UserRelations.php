@@ -26,7 +26,7 @@ class UserRelations implements IUserRelations
 		if($this->getNumberOfRelations() >= self::MAX_DIRECT_RELATIONS) {
 			return false;
 		}
-		//$r = $this->db->query('SELECT EXISTS (SELECT * FROM user_relations WHERE user_id = $this->user->getId() AND relation_id = $user->getId())');
+
 		$r = $this->db->query('SELECT COUNT(*) FROM user_relations WHERE user_id = ' . $this->user->getId() . ' AND relation_id = ' . $user->getId() . ' LIMIT 1');
 		$r = intval($r->fetch_array()[0]);
 		if($r === 0) {
